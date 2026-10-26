@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>برای سارا</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800&display=swap">
+<style>
+:root{--bg:#f2f5f3;--card:#fff;--ink:#1c2b2a;--mute:#5b6e6b;--accent:#1f6f6b;--accent2:#3aa39d;--line:#d5e0dd;--on:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1a;--card:#172827;--ink:#e8f1ef;--mute:#9db5b1;--accent:#5fd0c7;--accent2:#2a8f88;--line:#284240;--on:#0f1b1a}}
+:root[data-theme="dark"]{--bg:#0f1b1a;--card:#172827;--ink:#e8f1ef;--mute:#9db5b1;--accent:#5fd0c7;--accent2:#2a8f88;--line:#284240;--on:#0f1b1a}
+:root[data-mood="yalda"]{--bg:#15112b;--card:#201a3d;--ink:#f6e9ee;--mute:#b9a6c4;--accent:#ff6b78;--accent2:#c1263a;--line:#3a3160;--on:#15112b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;line-height:1.9;font-size:17px}
+main{max-width:680px;margin:0 auto;padding:26px 18px 70px}
+h1{font-size:clamp(40px,12vw,72px);font-weight:800;line-height:1.2;margin:4px 0;color:var(--accent)}
+[data-mood="yalda"] h1{text-shadow:0 0 28px var(--accent2)}
+h2{font-size:20px;font-weight:600;margin:28px 0 10px}
+.sub{color:var(--mute);margin:0}
+nav{display:flex;gap:6px;overflow-x:auto;margin:22px 0 4px;padding-bottom:6px}
+nav button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:6px 14px;border-radius:999px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);color:var(--on);border-color:var(--accent)}
+.big{margin-top:20px;padding:22px;border:2px solid var(--accent);border-radius:22px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.big b{font-size:56px;font-weight:800;line-height:1;color:var(--accent)}
+.gift{width:100%;margin-top:22px;padding:36px 18px;border:0;border-radius:24px;background:var(--accent);color:var(--on);font:inherit;font-size:24px;font-weight:800;cursor:pointer}
+.msg{margin-top:22px;padding:26px;border-radius:24px;background:var(--card);border:2px solid var(--accent);white-space:pre-wrap;font-size:19px;animation:rise .7s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.msg{animation:none}}
+.it{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 12px}
+.it .d{font-size:13px;color:var(--mute)}
+.it .t{font-weight:600;font-size:18px}
+.it .x{white-space:pre-wrap;margin:2px 0 0}
+.it .done{text-decoration:line-through;color:var(--mute)}
+.it a{color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.grid .it{padding:6px}
+.grid img,.grid video{width:100%;height:170px;object-fit:cover;border-radius:12px;display:block}
+.box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 2px}
+input,textarea{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input[type=checkbox]{width:auto;margin-left:8px}
+textarea{min-height:90px;resize:vertical}
+button.b{margin-top:12px;padding:10px 20px;border:0;border-radius:12px;background:var(--accent);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
+button.l{background:none;border:0;color:var(--mute);font:inherit;font-size:14px;cursor:pointer;padding:2px 0}
+.empty,.note{color:var(--mute)}
+.note{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:12px 14px;margin-top:16px;font-size:15px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+var C=window.CFG||{};
+var sb=null;
+try{sb=window.supabase.createClient(C.URL,C.KEY)}catch(e){}
+var DEFAULT_MSG="سارا جان، تولدت مبارک!\nامشب شب یلداست و تو بهترین هدیه‌ی زندگی منی.\nدوستت دارم.";
+var S={tab:'home',d:{},cfg:{},uid:null,who:'',canEdit:false,preview:false,opened:false,live:false};
+var app=document.getElementById('app');
+var TABS=[['home','خانه'],['memories','خاطره‌ها'],['photos','عکس‌ها'],['letters','نامه‌ها'],['wishes','آرزوها'],['journal','دفتر ما'],['songs','آهنگ‌ها']];
+var TITLE={memories:'خاطره‌ها',photos:'عکس و ویدیو',letters:'نامه‌های قفل‌شده',wishes:'آرزوها و برنامه‌های آینده',journal:'دفتر مشترک',songs:'آهنگ‌های ما'};
+var F={
+ memories:[['d','تاریخ','date'],['t','عنوان','i'],['x','متن','t']],
+ wishes:[['t','کاری که می‌خواهیم با هم بکنیم','i']],
+ letters:[['t','عنوان','i'],['x','نامه','t'],['u','تاریخی که باز می‌شود','date']],
+ journal:[['x','امروز چه خبر؟','t']],
+ songs:[['t','نام آهنگ','i'],['a','خواننده','i'],['x','چرا مال ماست؟','i'],['l','لینک (اختیاری)','i']]
+};
+var REQ={memories:['t'],wishes:['t'],letters:['t','x','u'],journal:['x'],songs:['t']};
+
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e}
+function fa(n){return Number(n).toLocaleString('fa-IR',{useGrouping:false})}
+function iso(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fd(s){try{return new Date(s+'T12:00:00').toLocaleDateString('fa-IR-u-ca-persian',{year:'numeric',month:'long',day:'numeric'})}catch(e){return s}}
+function jal(dt){
+  var p=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(dt);
+  var g=function(t){var f=p.find(function(x){return x.type===t});return f?+f.value:0};
+  return {m:g('month'),d:g('day')};
+}
+function daysLeft(){
+  var n=new Date();
+  for(var i=0;i<400;i++){var j=jal(new Date(n.getFullYear(),n.getMonth(),n.getDate()+i,12));if(j.m===9&&j.d===30)return i}
+  return -1;
+}
+function mood(){document.documentElement.setAttribute('data-mood',(daysLeft()===0||S.preview)?'yalda':'calm')}
+function field(p,label,node){p.appendChild(el('label','',label));p.appendChild(node);return node}
+function dataOf(o){var d={};for(var k in o)if(k!=='id'&&k!=='by'&&k!=='ts')d[k]=o[k];return d}
+
+/* ---------- data ---------- */
+async function loadAll(){
+  var r=await sb.from('items').select('*');
+  if(r.error)return;
+  S.d={};
+  r.data.forEach(function(x){var o=x.data||{};o.id=x.id;o.by=x.by;o.ts=x.ts;(S.d[x.col]=S.d[x.col]||[]).push(o)});
+  var c=await sb.from('config').select('value').eq('key','main').maybeSingle();
+  S.cfg=(c.data&&c.data.value)||{};
+  if(S.tab==='home')show();else fill(S.tab);
+}
+async function add(n,o){
+  var r=await sb.from('items').insert({col:n,ts:o.ts,data:dataOf(o)});
+  if(r.error)throw r.error;
+  await loadAll();
+}
+async function start(sess){
+  var u=sess.user;
+  S.uid=u.id;
+  S.who=(C.NAMES&&C.NAMES[u.email])||String(u.email).split('@')[0];
+  S.canEdit=u.email===C.ADMIN_EMAIL;
+  if(!S.live){
+    S.live=true;
+    sb.channel('live')
+      .on('postgres_changes',{event:'*',schema:'public',table:'items'},loadAll)
+      .on('postgres_changes',{event:'*',schema:'public',table:'config'},loadAll)
+      .subscribe();
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&S.uid)loadAll()});
+  }
+  show();
+  await loadAll();
+}
+
+/* ---------- views ---------- */
+function header(){
+  app.appendChild(el('p','sub','برای'));
+  app.appendChild(el('h1','','سارا'));
+  app.appendChild(el('p','sub','۳۰ آذر، شب یلدا'));
+}
+function show(){
+  mood();
+  app.innerHTML='';
+  header();
+  if(!sb||!C.URL||String(C.URL).indexOf('YOUR')>-1){
+    app.appendChild(el('p','note','فایل config.js هنوز پر نشده. راهنمای README را دنبال کن.'));return;
+  }
+  if(!S.uid){loginView();return}
+  var nav=el('nav');
+  TABS.forEach(function(t){
+    var b=el('button','',t[1]);
+    b.setAttribute('aria-current',String(S.tab===t[0]));
+    b.onclick=function(){S.tab=t[0];show();window.scrollTo(0,0)};
+    nav.appendChild(b);
+  });
+  var out=el('button','',S.who+' · خروج');
+  out.onclick=async function(){await sb.auth.signOut();S.uid=null;show()};
+  nav.appendChild(out);
+  app.appendChild(nav);
+  if(S.tab==='home')home();else listView(S.tab);
+}
+
+function loginView(){
+  var b=el('div','box');
+  var e=field(b,'ایمیل',el('input'));e.type='email';e.autocomplete='username';
+  var p=field(b,'رمز عبور',el('input'));p.type='password';p.autocomplete='current-password';
+  var msg=el('p','sub','');
+  var go=el('button','b','ورود');
+  go.onclick=async function(){
+    msg.textContent='';
+    var r=await sb.auth.signInWithPassword({email:e.value.trim(),password:p.value});
+    if(r.error){msg.textContent='ایمیل یا رمز اشتباه است.';return}
+    start(r.data.session);
+  };
+  b.appendChild(go);b.appendChild(msg);
+  app.appendChild(b);
+}
+
+function home(){
+  var left=daysLeft(),day=left===0;
+  if(day||S.preview){
+    if(!S.opened){
+      var g=el('button','gift','🎁 هدیه‌ات را باز کن');
+      g.onclick=function(){S.opened=true;show()};
+      app.appendChild(g);
+    }else app.appendChild(el('div','msg',S.cfg.msg||DEFAULT_MSG));
+  }else if(left>0){
+    var c=el('div','big');
+    c.appendChild(el('b','',fa(left)));
+    c.appendChild(el('span','','روز تا تولد سارا مانده'));
+    app.appendChild(c);
+  }
+  if(S.cfg.since){
+    var d0=new Date(S.cfg.since+'T12:00:00'),n=new Date();
+    var days=Math.floor((n-d0)/864e5);
+    var nx=new Date(n.getFullYear(),d0.getMonth(),d0.getDate(),23,59);
+    if(nx<n)nx.setFullYear(nx.getFullYear()+1);
+    var to=Math.ceil((nx-n)/864e5),yrs=nx.getFullYear()-d0.getFullYear();
+    var t=el('div','big');
+    t.appendChild(el('b','',fa(days)));
+    t.appendChild(el('span','','روز با هم'));
+    app.appendChild(t);
+    app.appendChild(el('p','sub',fa(to)+' روز تا سالگرد '+fa(yrs)+'ـم'));
+  }
+  if(S.canEdit){
+    app.appendChild(el('h2','','تنظیمات'));
+    var b=el('div','box');
+    var m=field(b,'پیام روز تولد (فقط ۳۰ آذر نمایش داده می‌شود)',el('textarea'));
+    m.value=S.cfg.msg||DEFAULT_MSG;m.style.minHeight='130px';
+    var s=field(b,'از چه روزی با هم هستید؟',el('input'));s.type='date';s.value=S.cfg.since||'';
+    var sv=el('button','b','ذخیره');
+    sv.onclick=async function(){
+      var r=await sb.from('config').upsert({key:'main',value:{msg:m.value,since:s.value}});
+      if(r.error)alert('ذخیره نشد.');else loadAll();
+    };
+    b.appendChild(sv);
+    var pv=el('button','l',S.preview?'بستن پیش‌نمایش تولد':'پیش‌نمایش روز تولد');
+    pv.style.display='block';pv.style.marginTop='10px';
+    pv.onclick=function(){S.preview=!S.preview;S.opened=false;show();window.scrollTo(0,0)};
+    b.appendChild(pv);
+    app.appendChild(b);
+  }
+}
+
+function listView(n){
+  app.appendChild(el('h2','',TITLE[n]));
+  if(n==='photos')uploader();else app.appendChild(form(n));
+  if(n==='letters')app.appendChild(el('p','note','نامه تا تاریخ باز شدن قفل است. فقط نویسنده می‌تواند آن را زودتر بخواند.'));
+  var L=el('div',n==='photos'?'grid':'');L.id='L';
+  app.appendChild(L);
+  fill(n);
+}
+
+function form(n){
+  var b=el('div','box'),ins={};
+  F[n].forEach(function(f){
+    var i=el(f[2]==='t'?'textarea':'input');
+    if(f[2]==='date'){i.type='date';if(f[0]==='d')i.value=iso()}
+    field(b,f[1],i);ins[f[0]]=i;
+  });
+  var bt=el('button','b','افزودن');
+  bt.onclick=function(){
+    var o={ts:Date.now(),who:S.who};
+    for(var k in ins)o[k]=ins[k].value.trim();
+    if(REQ[n].some(function(k){return !o[k]})){alert('فیلدهای لازم را پر کن.');return}
+    if(n==='wishes')o.done=false;
+    add(n,o).then(function(){for(var k in ins)if(k!=='d')ins[k].value=''}).catch(function(){alert('ذخیره نشد.')});
+  };
+  b.appendChild(bt);
+  return b;
+}
+
+function uploader(){
+  var b=el('div','box'),st=el('p','sub','');
+  var i=el('input');i.type='file';i.accept='image/*,video/*';i.multiple=true;
+  i.onchange=async function(){
+    var fs=Array.prototype.slice.call(i.files);
+    for(var k=0;k<fs.length;k++){
+      st.textContent='در حال آپلود '+fa(k+1)+' از '+fa(fs.length)+' …';
+      try{
+        var f=fs[k];
+        var ext=(f.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'');
+        var path=S.uid+'/'+Date.now()+'-'+k+'.'+ext;
+        var u=await sb.storage.from('media').upload(path,f,{contentType:f.type});
+        if(u.error)throw u.error;
+        var url=sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+        await add('photos',{ts:Date.now(),who:S.who,url:url,path:path,ct:f.type});
+      }catch(e){st.textContent='آپلود '+fs[k].name+' انجام نشد.';return}
+    }
+    st.textContent='انجام شد.';i.value='';
+  };
+  field(b,'عکس یا ویدیو',i);b.appendChild(st);
+  app.appendChild(b);
+}
+
+function fill(n){
+  if(S.tab!==n)return;
+  var L=document.getElementById('L');if(!L)return;
+  var a=(S.d[n]||[]).slice();
+  a.sort(function(x,y){return n==='memories'?((y.d||'').localeCompare(x.d||'')||y.ts-x.ts):y.ts-x.ts});
+  if(n==='wishes')a=a.filter(function(x){return !x.done}).concat(a.filter(function(x){return x.done}));
+  L.innerHTML='';
+  if(!a.length){L.appendChild(el('p','empty','هنوز چیزی اینجا نیست.'));return}
+  a.forEach(function(o){L.appendChild(n==='photos'?photo(o):item(n,o))});
+}
+
+function canDel(o){return S.canEdit||o.by===S.uid}
+function remove(o,extra){
+  if(!confirm('حذف شود؟'))return;
+  sb.from('items').delete().eq('id',o.id).then(function(r){
+    if(r.error){alert('حذف نشد.');return}
+    if(extra)extra();
+    loadAll();
+  });
+}
+
+function item(n,o){
+  var li=el('div','it');
+  li.appendChild(el('div','d',(o.who?o.who+' · ':'')+fd(o.d||iso(new Date(o.ts)))));
+  var lock=n==='letters'&&o.u>iso()&&o.by!==S.uid;
+  if(lock){
+    li.appendChild(el('div','t','🔒 نامه‌ای که '+fd(o.u)+' باز می‌شود'));
+  }else{
+    if(n==='wishes'){
+      var w=el('label'),c=el('input');c.type='checkbox';c.checked=!!o.done;
+      c.onchange=function(){
+        var d=dataOf(o);d.done=c.checked;
+        sb.from('items').update({data:d}).eq('id',o.id).then(function(r){if(r.error)c.checked=!c.checked;else loadAll()});
+      };
+      w.style.color='var(--ink)';w.style.fontSize='18px';
+      w.appendChild(c);w.appendChild(el('span',o.done?'done':'',o.t));
+      li.appendChild(w);
+    }else{
+      if(o.t)li.appendChild(el('div','t',o.t));
+      if(o.a)li.appendChild(el('div','d',o.a));
+      if(o.x)li.appendChild(el('p','x',o.x));
+      if(o.l&&/^https?:\/\//.test(o.l)){
+        var a=el('a','','باز کردن لینک');a.href=o.l;a.target='_blank';a.rel='noopener noreferrer';
+        li.appendChild(a);
+      }
+    }
+  }
+  if(canDel(o)){var d=el('button','l','حذف');d.onclick=function(){remove(o)};li.appendChild(d)}
+  return li;
+}
+
+function photo(o){
+  var f=el('div','it'),m;
+  if((o.ct||'').indexOf('video')===0){m=el('video');m.controls=true;m.preload='metadata'}
+  else{m=el('img');m.loading='lazy';m.alt='عکس'}
+  m.src=o.url;f.appendChild(m);
+  if(canDel(o)){
+    var d=el('button','l','حذف');
+    d.onclick=function(){remove(o,function(){if(o.path)sb.storage.from('media').remove([o.path])})};
+    f.appendChild(d);
+  }
+  return f;
+}
+
+show();
+if(sb){
+  sb.auth.getSession().then(function(r){if(r.data&&r.data.session)start(r.data.session)}).catch(function(){});
+}
+})();
+</script>
+</body>
+</html>
